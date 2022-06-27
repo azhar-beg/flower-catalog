@@ -1,0 +1,47 @@
+body {
+  width: 1500px;
+  margin: 50px auto;
+}
+
+.home {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.home h1 {
+  font-size: x-large;
+  width: 300px;
+  border-top: 1px solid rgb(175, 172, 172);
+  border-bottom: 2px solid rgb(129, 126, 126);
+  color: orange;
+  padding: 20px;
+  padding-left: 63%;
+}
+
+.page {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.page .abeliophyllum {
+  width: 700px;
+  padding-top: 550px;
+}
+
+.page .agerantum {
+  width: 400px;
+  padding-top: 300px;
+}
+
+.page header {
+  width: 50%;
+  font-size: x-large;
+  display: flex;
+  border-bottom: 2px solid rgb(129, 126, 126);
+  color: orange;
+  padding-left: 43%;
+}
+
+.home>div {
+  padding-top: 250px;
+}

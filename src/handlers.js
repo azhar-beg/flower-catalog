@@ -38,11 +38,15 @@ const addComment = function (name, comment) {
   writeJSON(comments)
 };
 
-const serveGuestPage = function ({ uri, params }, response) {
+const addNewComments = function ({ uri, params }) {
   const { name, comment } = params;
   if (name && comment && uri === PATH) {
     addComment(name, comment);
   }
+  return false;
+}
+
+const serveGuestPage = function ({ uri }, response) {
   if (uri === PATH) {
     response.send(guestBookHtml());
     return true
@@ -50,4 +54,4 @@ const serveGuestPage = function ({ uri, params }, response) {
   return false;
 };
 
-module.exports = { serveGuestPage };
+module.exports = { addNewComments, serveGuestPage };
