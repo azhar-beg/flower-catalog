@@ -1,6 +1,15 @@
+const parseValue = function (value) {
+  let parsedValue = value;
+  parsedValue = parsedValue.replace(/\+/g, ' ');
+  parsedValue = parsedValue.replace(/\%27/g, '\'');
+  parsedValue = parsedValue.replace(/\%2C/g, ',');
+  parsedValue = parsedValue.replace(/\%0D\%0A/, '\n');
+  return parsedValue;
+};
+
 const parseParams = rawParams => rawParams.split('&').reduce((params, param) => {
   const [key, value] = param.split('=');
-  params[key] = value.replace(/\+/g, ' ');
+  params[key] = parseValue(value);
   return params;
 }, {});
 
