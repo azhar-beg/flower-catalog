@@ -1,5 +1,6 @@
-const { serveHomePage } = require('./handlers.js');
+const { serveGuestPage } = require('./handlers.js');
 const { notFound } = require('./notFoundHandler.js');
+const { serveFileContent } = require('./serveFileContent.js');
 
 const createReqHandler = handlers => (request, response) => {
   for (const handler of handlers) {
@@ -9,7 +10,7 @@ const createReqHandler = handlers => (request, response) => {
   }
 }
 
-const handlers = [serveHomePage, notFound];
+const handlers = [serveFileContent, serveGuestPage, notFound];
 const reqHandler = createReqHandler(handlers);
 
 module.exports = { reqHandler };

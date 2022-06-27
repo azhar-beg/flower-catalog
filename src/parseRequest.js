@@ -1,12 +1,13 @@
 const parseParams = rawParams => rawParams.split('&').reduce((params, param) => {
   const [key, value] = param.split('=');
-  params[key] = value;
+  params[key] = value.replace(/\+/g, ' ');
   return params;
 }, {});
 
 const parseUri = rawUri => {
   const [uri, rawParams] = rawUri.split('?');
   const params = rawParams ? parseParams(rawParams) : {};
+  console.log({ uri, params });
   return { uri, params };
 };
 
