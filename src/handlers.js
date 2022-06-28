@@ -1,57 +1,51 @@
 const fs = require('fs');
-const COMMENTS = './data/comments.json';
+const { GuestBook } = require('./comments');
 const PATH = '/guest-book';
-const TEMPLATE = './templates/guest-book.html';
 
-const generateDiv = function (content, style = '') {
-  return `<div class="${style}">${content}</div>`;
+const readJSON = (file) => {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"))
+  } catch (error) {
+    return false;
+  }
 };
 
-const readJSON = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
-const writeJSON = content => {
-  fs.writeFileSync(COMMENTS, JSON.stringify(content), 'utf8');
+const storeComments = (guestBook) => (request, response) => {
+  request.guestBook = guestBook;
+  return false;
 }
 
-const commentHtml = function ({ name, date, comment }) {
-  return generateDiv(
-    generateDiv(date.split(' G')[0], 'date') +
-    generateDiv(name, 'name') +
-    generateDiv(comment, 'message'), 'comment'
-  )
-};
+const readComments = () => {
+  const commentFile = './data/comments.json'
+  const commentList = readJSON(commentFile).reverse() || [];
+  const guestBook = new GuestBook();
+  commentList.forEach((comment) => {
+    guestBook.addComment(comment);
+  });
+  return guestBook;
+}
 
-const getComments = function () {
-  const rawComments = readJSON(COMMENTS);
-  return rawComments.map(comment => commentHtml(comment)).join('');
-};
-
-const guestBookHtml = function () {
-  const comments = getComments();
-  const template = fs.readFileSync(TEMPLATE, 'utf8');
-  return template.replace(/__COMMENTS__/, comments);
-};
-
-const addComment = function (name, comment) {
-  const comments = readJSON(COMMENTS);
+const writeComments = function (name, comment, guestBook) {
   const date = (new Date()).toString();
-  comments.unshift({ name, date, comment })
-  writeJSON(comments)
+  guestBook.addComment({ name, comment, date });
+  guestBook.writeComments('./data/comments.json');
 };
 
-const addNewComments = function ({ uri, params }) {
+const addNewComments = function ({ uri, params, guestBook }) {
   const { name, comment } = params;
   if (name && comment && uri === PATH) {
-    addComment(name, comment);
+    writeComments(name, comment, guestBook);
   }
   return false;
 }
 
-const serveGuestPage = function ({ uri }, response) {
+const serveGuestPage = function ({ uri, guestBook }, response) {
+  console.log(guestBook);
   if (uri === PATH) {
-    response.send(guestBookHtml());
+    response.send(guestBook.createPage());
     return true
   }
   return false;
 };
 
-module.exports = { addNewComments, serveGuestPage };
+module.exports = { storeComments, readComments, addNewComments, serveGuestPage };
