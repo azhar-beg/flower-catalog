@@ -38,7 +38,6 @@ class GuestBook {
   writeComments(file) {
     fs.writeFileSync(file, JSON.stringify(this.#comments), 'utf8');
   }
-
 }
 
 module.exports = { GuestBook };

@@ -6,7 +6,7 @@ const readJSON = (file) => {
   try {
     return JSON.parse(fs.readFileSync(file, "utf8"))
   } catch (error) {
-    return false;
+    return;
   }
 };
 
@@ -17,7 +17,7 @@ const storeComments = (guestBook) => (request, response) => {
 
 const readComments = () => {
   const commentFile = './data/comments.json'
-  const commentList = readJSON(commentFile).reverse() || [];
+  const commentList = readJSON(commentFile)?.reverse() || [];
   const guestBook = new GuestBook();
   commentList.forEach((comment) => {
     guestBook.addComment(comment);
