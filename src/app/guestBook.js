@@ -3,7 +3,7 @@ const fs = require('fs');
 const generateDiv = (content, style = '') => `<div class="${style}">${content}</div>`;
 
 const commentHtml = ({ name, date, comment }) => generateDiv(
-  generateDiv(date.split(' G')[0], 'date') +
+  generateDiv(date, 'date') +
   generateDiv(name, 'name') +
   generateDiv(comment, 'message'), 'comment'
 );
@@ -32,7 +32,7 @@ class GuestBook {
   }
 
   writeComments(name, comment, file) {
-    const date = (new Date()).toString();
+    const date = (new Date()).toLocaleString();
     this.addComment({ name, comment, date });
     fs.writeFileSync(file, JSON.stringify(this.#comments), 'utf8');
   }

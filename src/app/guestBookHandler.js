@@ -8,7 +8,7 @@ const getParams = url => {
   return params;
 };
 
-const addNewComments = (req, res, guestFile) => {
+const writeGuestBook = (req, res, guestFile) => {
   const { guestBook, url } = req;
   const { name, comment } = getParams(url);
   if (name && comment) {
@@ -27,18 +27,21 @@ const showGuestPage = (req, res) => {
   return true;
 };
 
-const serveGuestPage = guestFile => (req, res) => {
-  const { url, method } = req;
-  if (url.pathname === "/add-comment" && method === 'GET') {
-    req.guestBook = readComments(guestFile);
-    return addNewComments(req, res, guestFile);
-  }
+const serveGuestPage = guestFile => {
+  const guestBook = readComments(guestFile);
+  return (req, res) => {
+    const { url, method } = req;
+    if (url.pathname === "/add-comment" && method === 'GET') {
+      req.guestBook = guestBook
+      return writeGuestBook(req, res, guestFile);
+    }
 
-  if (url.pathname === '/guest-book' && method === 'GET') {
-    req.guestBook = readComments(guestFile);
-    return showGuestPage(req, res);
+    if (url.pathname === '/guest-book' && method === 'GET') {
+      req.guestBook = guestBook;
+      return showGuestPage(req, res);
+    }
+    return false
   }
-  return false
 }
 
 module.exports = { serveGuestPage };
