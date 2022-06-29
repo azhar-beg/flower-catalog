@@ -35,7 +35,9 @@ class GuestBook {
     return guestBookHtml(this.#commentHtml())
   }
 
-  writeComments(file) {
+  writeComments(name, comment, file) {
+    const date = (new Date()).toString();
+    this.addComment({ name, comment, date });
     fs.writeFileSync(file, JSON.stringify(this.#comments), 'utf8');
   }
 }

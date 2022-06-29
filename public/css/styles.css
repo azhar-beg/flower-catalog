@@ -45,3 +45,24 @@ body {
 .home>div {
   padding-top: 250px;
 }
+
+.comments {
+  margin: auto;
+  width: 960px;
+}
+
+.comments header {
+  padding-left: 450px;
+  color: orange;
+}
+
+textarea {
+  margin-top: 2px;
+  width: 180px;
+  height: 60px;
+}
+
+.comment-list>.comment {
+  display: flex;
+  column-gap: 15px;
+}

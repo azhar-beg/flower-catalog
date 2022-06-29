@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { GuestBook } = require('./comments');
+const { GuestBook } = require('./guestBook.js');
 const PATH = '/guest-book';
 
 const readJSON = (file) => {
@@ -25,24 +25,31 @@ const readComments = () => {
   return guestBook;
 }
 
-const writeComments = function (name, comment, guestBook) {
-  const date = (new Date()).toString();
-  guestBook.addComment({ name, comment, date });
-  guestBook.writeComments('./data/comments.json');
+const getParams = url => {
+  const params = {};
+  for ([key, value] of url.searchParams.entries()) {
+    params[key] = value
+  }
+  return params;
 };
 
-const addNewComments = function ({ uri, params, guestBook }) {
-  const { name, comment } = params;
-  if (name && comment && uri === PATH) {
-    writeComments(name, comment, guestBook);
+const addNewComments = function (req, res) {
+  const { guestBook, url } = req;
+  const { name, comment } = getParams(url);
+  if (url.pathname === "/add-comment") {
+    guestBook.writeComments(name, comment, './data/comments.json');
+    res.statusCode = 302;
+    res.setHeader('location', '/guest-book');
+    res.end('');
+    return true;
   }
   return false;
 }
 
-const serveGuestPage = function ({ uri, guestBook }, response) {
-  console.log(guestBook);
-  if (uri === PATH) {
-    response.send(guestBook.createPage());
+const serveGuestPage = function (req, res) {
+  const { url, guestBook } = req
+  if (url.pathname === PATH) {
+    res.end(guestBook.createPage());
     return true
   }
   return false;

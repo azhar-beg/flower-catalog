@@ -2,15 +2,16 @@
 
 <head>
   <title>Form</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
   <div class="comments">
-    <div><a href="/home.html">&lt;&lt;</a></div>
-    <h1>Guest Book</h1>
+    <header>
+      <h1><a href="/home.html">&lt;&lt;</a>Guest Book</h1>
+    </header>
     <h2>Leave a comment</h2>
-    <form action="/guest-book" method="get">
+    <form action="/add-comment" method="get">
       <div>
         <label for="name">Name: </label>
         <input type="text" value="" name="name">
@@ -22,8 +23,8 @@
       <div>
         <input type="submit">
       </div>
-      <div>__COMMENTS__</div>
     </form>
+    <div class="comment-list">__COMMENTS__</div>
   </div>
 </body>
 

@@ -13,20 +13,20 @@ const determineType = (fileName) => {
   if (suffix === 'pdf') {
     return 'application/pdf';
   }
+  return 'plain/text';
 };
 
-const serveFileContent = function (request, response) {
-  const fileName = request.uri === '/' ? '/home.html' : request.uri;
+const serveFileContent = function (req, res) {
+  const fileName = req.url.pathname === '/' ? '/home.html' : req.url.pathname;
   const path = `./public${fileName}`;
 
   if (!fs.existsSync(path)) {
-    console.log(path);
     return false;
   }
 
   const content = fs.readFileSync(path);
-  response.setHeaders('content-type', determineType(path));
-  response.send(content);
+  res.setHeader('content-type', determineType(path));
+  res.end(content);
   return true;
 };
 

@@ -32,7 +32,7 @@ class Response {
     this.#socket.write(content);
   }
 
-  setHeaders(key, value) {
+  setHeader(key, value) {
     this.#headers[key] = value;
   }
 
@@ -44,7 +44,7 @@ class Response {
 
   send(content) {
     this.#write(this.#response());
-    this.setHeaders('content-length', content.length);
+    this.setHeader('content-length', content.length);
     this.#writeHeaders();
     this.#write(EOL);
     this.#write(content);
