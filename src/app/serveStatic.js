@@ -3,23 +3,19 @@ const path = require('path');
 
 const determineType = (fileName) => {
   const extension = path.extname(fileName);
-  if (extension === '.html') {
-    return 'text/html';
+  const mimeTypes = {
+    '.html': 'text/html',
+    '.jpg': 'image/jpg',
+    '.pdf': 'application/pdf',
+    '.css': 'text/css',
+    '.gif': 'image/gif',
   }
-  if (extension === '.jpg') {
-    return 'image/jpg';
-  }
-
-  if (extension === '.pdf') {
-    return 'application/pdf';
-  }
-  return 'plain/text';
+  return mimeTypes[extension] || 'plain/text';
 };
 
 const serveStatic = sourceRoot => function (req, res) {
   const fileName = req.url.pathname === '/' ? '/home.html' : req.url.pathname;
   const filePath = sourceRoot + fileName;
-
   if (!fs.existsSync(filePath)) {
     return false;
   }

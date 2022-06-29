@@ -1,18 +1,14 @@
 const fs = require('fs');
 
-const generateDiv = function (content, style = '') {
-  return `<div class="${style}">${content}</div>`;
-};
+const generateDiv = (content, style = '') => `<div class="${style}">${content}</div>`;
 
-const commentHtml = function ({ name, date, comment }) {
-  return generateDiv(
-    generateDiv(date.split(' G')[0], 'date') +
-    generateDiv(name, 'name') +
-    generateDiv(comment, 'message'), 'comment'
-  )
-};
+const commentHtml = ({ name, date, comment }) => generateDiv(
+  generateDiv(date.split(' G')[0], 'date') +
+  generateDiv(name, 'name') +
+  generateDiv(comment, 'message'), 'comment'
+);
 
-const guestBookHtml = function (comments) {
+const guestBookHtml = (comments) => {
   const template = fs.readFileSync('./templates/guest-book.html', 'utf8');
   return template.replace(/__COMMENTS__/, comments);
 };

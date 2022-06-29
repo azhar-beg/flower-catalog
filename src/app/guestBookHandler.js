@@ -1,30 +1,4 @@
-const fs = require('fs');
-const { GuestBook } = require('./guestBook.js');
-
-const readJSON = (file) => {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"))
-  } catch (error) {
-    return;
-  }
-};
-
-const storeComments = (guestBook) => (request, response) => {
-  const { pathname } = request.url;
-  if (pathname === '/guest-book' || pathname === '/add-comment') {
-    request.guestBook = guestBook;
-  }
-  return false;
-}
-
-const readComments = (fileName) => {
-  const commentList = readJSON(fileName)?.reverse() || [];
-  const guestBook = new GuestBook();
-  commentList.forEach((comment) => {
-    guestBook.addComment(comment);
-  });
-  return guestBook;
-}
+const { readComments } = require("./readComments.js");
 
 const getParams = url => {
   const params = {};
@@ -34,11 +8,11 @@ const getParams = url => {
   return params;
 };
 
-const addNewComments = function (req, res) {
+const addNewComments = (req, res, guestFile) => {
   const { guestBook, url } = req;
   const { name, comment } = getParams(url);
-  if (url.pathname === "/add-comment" && name && comment) {
-    guestBook.writeComments(name, comment, './data/comments.json');
+  if (name && comment) {
+    guestBook.writeComments(name, comment, guestFile);
     res.statusCode = 302;
     res.setHeader('location', '/guest-book');
     res.end('');
@@ -47,13 +21,24 @@ const addNewComments = function (req, res) {
   return false;
 }
 
-const serveGuestPage = function (req, res) {
-  const { url, guestBook } = req
-  if (url.pathname === '/guest-book') {
-    res.end(guestBook.createPage());
-    return true
-  }
-  return false;
+const showGuestPage = (req, res) => {
+  const { guestBook } = req;
+  res.end(guestBook.createPage());
+  return true;
 };
 
-module.exports = { storeComments, readComments, addNewComments, serveGuestPage };
+const serveGuestPage = guestFile => (req, res) => {
+  const { url, method } = req;
+  if (url.pathname === "/add-comment" && method === 'GET') {
+    req.guestBook = readComments(guestFile);
+    return addNewComments(req, res, guestFile);
+  }
+
+  if (url.pathname === '/guest-book' && method === 'GET') {
+    req.guestBook = readComments(guestFile);
+    return showGuestPage(req, res);
+  }
+  return false
+}
+
+module.exports = { serveGuestPage };
