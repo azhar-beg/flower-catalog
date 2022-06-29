@@ -19,6 +19,7 @@ const determineType = (fileName) => {
 const serveFileContent = function (req, res) {
   const fileName = req.url.pathname === '/' ? '/home.html' : req.url.pathname;
   const path = `./public${fileName}`;
+  console.log(path);
 
   if (!fs.existsSync(path)) {
     return false;
