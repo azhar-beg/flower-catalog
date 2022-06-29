@@ -1,6 +1,6 @@
 const http = require('http');
 
-const { reqHandler } = require('./src/server/createReqHandler.js');
+const { reqHandler } = require('./src/server/router.js');
 
 const startServer = function (PORT, requestHandler) {
   const server = http.createServer(requestHandler)
