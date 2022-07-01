@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const writeContent = function (content, file) {
   fs.writeFileSync(file, content, 'utf8');
 }
@@ -10,4 +12,10 @@ const getParams = searchParams => {
   return params;
 };
 
-module.exports = { writeContent, getParams };
+const urlInstruction = () => '<div>api link: => http://localhost:8181/api?name=all&comment=all</div>';
+const nameKeyInstruction = () => '<div>key:name -> get comments of specific users.</div>';
+const commentKeyInstruction = () => "<div>key:comment -> get comments with specific content.</div>";
+
+const instructions = { urlInstruction, nameKeyInstruction, commentKeyInstruction }
+
+module.exports = { writeContent, getParams, ...instructions };

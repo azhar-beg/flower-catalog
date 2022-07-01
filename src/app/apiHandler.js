@@ -1,10 +1,15 @@
-const { getParams } = require("../lib.js");
+const { getParams,
+  urlInstruction,
+  nameKeyInstruction,
+  commentKeyInstruction
+} = require("../lib.js");
+
 const { readComments } = require("./readComments.js");
 
 const serveInstruction = (req, res) => {
-  const url = '<div>api link: => http://localhost:8181/api?name=all&comment=all</div>';
-  const name = "<div>key:name -> get comments of specific users.</div>";
-  const comment = "<div>key:comment -> get comments with specific content.</div>";
+  const url = urlInstruction();
+  const name = nameKeyInstruction();
+  const comment = commentKeyInstruction;
   res.setHeader('content-type', 'text/html');
   res.end(`${url}<div>${name}\n${comment}</div>`);
 };
