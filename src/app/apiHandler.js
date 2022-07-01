@@ -40,6 +40,7 @@ const serveApiPage = guestFile => {
       serveInstruction(req, res);
       return;
     }
+
     if (pathname === '/api' && method === 'GET') {
       req.guestBook = guestBook
       serveApi(req, res);
