@@ -34,20 +34,25 @@ const showGuestPage = (req, res) => {
   res.end(createHtml(guestBook.getComments()));
 };
 
+const saveComments = function (req, res) {
+  req.setEncoding('utf8');
+  let data = '';
+  req.on('data', chunk => data += chunk);
+  req.on('end', () => {
+    req.url.params = new URLSearchParams(data);
+    writeGuestBook(req, res, req.guestFile);
+  })
+};
+
 const serveGuestPage = guestFile => {
   const guestBook = readComments(guestFile);
   return (req, res, next) => {
     const { url, method } = req;
     const { pathname } = url;
     if (pathname === "/add-comment" && method === 'POST') {
-      req.setEncoding('utf8');
-      let data = '';
-      req.on('data', chunk => data += chunk);
-      req.on('end', () => {
-        req.url.params = new URLSearchParams(data);
-        req.guestBook = guestBook
-        writeGuestBook(req, res, guestFile);
-      })
+      req.guestBook = guestBook;
+      req.guestFile = guestFile;
+      saveComments(req, res);
       return;
     }
 
