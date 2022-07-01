@@ -1,4 +1,4 @@
-const { getParams } = require("./guestBookHandler.js");
+const { getParams } = require("../lib.js");
 const { readComments } = require("./readComments.js");
 
 const serveInstruction = (req, res) => {
