@@ -1,13 +1,21 @@
-const { URL } = require('url');
-
-const router = handlers => (req, res) => {
-  req.url = new URL(req.url, `http://${req.headers.host}`)
-  for (const handler of handlers) {
-    if (handler(req, res)) {
-      return true;
+const createNext = handlers => {
+  let index = -1;
+  const callNextHandler = (req, res) => {
+    index++;
+    const currentHandler = handlers[index];
+    if (currentHandler) {
+      currentHandler(req, res, () => callNextHandler(req, res));
     }
-  }
+  };
+  return callNextHandler;
 };
-exports.router = router;
 
+const createRouter = (handlers) => {
+  return (req, res) => {
+    const next = createNext(handlers);
+    req.url = new URL(req.url, `http://${req.headers.host}`)
+    next(req, res);
+  };
+};
 
+module.exports = { createRouter };

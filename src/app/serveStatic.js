@@ -13,17 +13,16 @@ const determineType = (fileName) => {
   return mimeTypes[extension] || 'plain/text';
 };
 
-const serveStatic = sourceRoot => function (req, res) {
+const serveStatic = sourceRoot => function (req, res, next) {
   const fileName = req.url.pathname === '/' ? '/home.html' : req.url.pathname;
   const filePath = sourceRoot + fileName;
-  if (!fs.existsSync(filePath)) {
-    return false;
+  if (fs.existsSync(filePath)) {
+    const content = fs.readFileSync(filePath);
+    res.setHeader('content-type', determineType(filePath));
+    res.end(content);
+    return;
   }
-
-  const content = fs.readFileSync(filePath);
-  res.setHeader('content-type', determineType(filePath));
-  res.end(content);
-  return true;
+  next()
 };
 
 module.exports = { serveStatic };
