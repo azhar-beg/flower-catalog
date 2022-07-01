@@ -1,13 +1,11 @@
-const fs = require('fs');
-const { writeContent, getParams } = require('../lib.js');
+const { writeContent } = require('../lib.js');
 const { createHtml } = require("./guestBookHtml.js");
 const { readComments } = require("./readComments.js");
 
 const writeGuestBook = (req, res) => {
-  const { guestBook, url, guestFile } = req;
-  const { name, comment } = getParams(url.params);
+  const { guestBook, params, guestFile } = req;
   const date = new Date().toLocaleString();
-  guestBook.addComment({ name, comment, date });
+  guestBook.addComment({ ...params, date });
   writeContent(guestBook.getComments(), guestFile);
 
   res.statusCode = 302;
@@ -22,20 +20,13 @@ const showGuestPage = (req, res) => {
 
 const saveComments = function (req, res) {
   req.setEncoding('utf8');
-  let data = '';
-  req.on('data', chunk => data += chunk);
-  req.on('end', () => {
-    req.url.params = new URLSearchParams(data);
-    writeGuestBook(req, res);
-  })
+  writeGuestBook(req, res);
 };
 
 const serveGuestPage = guestFile => {
   const guestBook = readComments(guestFile);
   return (req, res, next) => {
-    const { url, method } = req;
-    const { pathname } = url;
-
+    const { pathname, method } = req;
     if (pathname === "/add-comment" && method === 'POST') {
       req.guestBook = guestBook;
       req.guestFile = guestFile;
@@ -52,4 +43,4 @@ const serveGuestPage = guestFile => {
   }
 }
 
-module.exports = { serveGuestPage, getParams };
+module.exports = { serveGuestPage };

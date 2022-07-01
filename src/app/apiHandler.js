@@ -1,4 +1,4 @@
-const { getParams,
+const {
   urlInstruction,
   nameKeyInstruction,
   commentKeyInstruction
@@ -24,7 +24,7 @@ const selectComments = (name, comment, guestBook) => {
 };
 
 const serveApi = (req, res) => {
-  const { name, comment } = getParams(req.url.searchParams);
+  const { name, comment } = req.params;
   if (name && comment) {
     const comments = selectComments(name, comment, req.guestBook);
     res.end(JSON.stringify(comments));
@@ -34,8 +34,7 @@ const serveApi = (req, res) => {
 const serveApiPage = guestFile => {
   const guestBook = readComments(guestFile);
   return (req, res, next) => {
-    const { url, method } = req;
-    const { pathname } = url;
+    const { pathname, method } = req;
     if (pathname === '/api-page' && method === 'GET') {
       serveInstruction(req, res);
       return;
