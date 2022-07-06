@@ -3,6 +3,16 @@
 <head>
   <title>Flower Catalog</title>
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    const hide = event => {
+      myEvent = event;
+      console.log('hello');
+      event.target.style.opacity = 0;
+      setTimeout(() => {
+        event.target.style.opacity = 1;
+      }, 1000);
+    }
+  </script>
 </head>
 
 <body>
@@ -16,7 +26,7 @@
         <li> <a href="abeliophyllum.html">Abeliophyllum</a></li>
         <li><a href="agerantum.html">Agerantum</a></li>
       </ul>
-      <div>
+      <div onclick="hide(event)">
         <img src="./animated-flower-image-0021.gif" alt="">
       </div>
       <div>
