@@ -13,21 +13,19 @@ const injectSession = sessions => {
   }
 }
 
-const doesUserExist = (username, password) => {
-  const users = [
-    { username: 'azhar', password: 'azhar' },
-    { username: 'suresh', password: 'suresh' },
-    { username: 'abin', password: 'abin' },
-    { username: 'rishabh', password: 'rishabh' },
-  ];
-  return users.some(user => {
-    return user.username === username && user.password === password;
-  });
+const doesUserExist = (users, username, password) => {
+  const user = users[username]
+  if (user) {
+    return user.password === password;
+  }
+  return false;
 };
 
 const sessionsHandler = (req, res) => {
-  const { username, password } = req.params;
-  if (!doesUserExist(username, password)) {
+  const { users, params } = req;
+  const { username, password } = params;
+
+  if (!doesUserExist(users, username, password)) {
     redirectLoginPage(res);
     return;
   }
@@ -49,8 +47,7 @@ const serveLoginPage = (req, res) => {
   return;
 };
 
-const createLoginHandler = (sessions, loginFormFile) => {
-  const loginForm = fs.readFileSync(loginFormFile);
+const createLoginHandler = (sessions, users) => {
   return (req, res, next) => {
     const { pathname } = req;
     if (pathname !== '/login') {
@@ -63,12 +60,7 @@ const createLoginHandler = (sessions, loginFormFile) => {
       return;
     }
 
-    if (req.method === 'GET') {
-      req.loginForm = loginForm;
-      serveLoginPage(req, res);
-      return;
-    }
-
+    req.users = users;
     req.sessions = sessions;
     sessionsHandler(req, res);
   };

@@ -10,7 +10,7 @@ const redirectToGuestBook = (res) => {
 
 const redirectLoginPage = (res) => {
   res.statusCode = 302;
-  res.setHeader('location', '/login');
+  res.setHeader('location', '/login.html');
   res.end();
 };
 
