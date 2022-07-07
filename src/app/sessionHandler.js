@@ -44,13 +44,13 @@ const sessionsHandler = (req, res) => {
 
 
 const serveLoginPage = (req, res) => {
-  const loginForm = fs.readFileSync(req.formTemplate);
   res.setHeader('content-type', 'text/html')
-  res.end(loginForm);
+  res.end(req.loginForm);
   return;
 };
 
 const createLoginHandler = (sessions, loginFormFile) => {
+  const loginForm = fs.readFileSync(loginFormFile);
   return (req, res, next) => {
     const { pathname } = req;
     if (pathname !== '/login') {
@@ -64,7 +64,7 @@ const createLoginHandler = (sessions, loginFormFile) => {
     }
 
     if (req.method === 'GET') {
-      req.formTemplate = loginFormFile;
+      req.loginForm = loginForm;
       serveLoginPage(req, res);
       return;
     }
@@ -74,21 +74,4 @@ const createLoginHandler = (sessions, loginFormFile) => {
   };
 };
 
-const createLogoutHandler = sessions => {
-  return (req, res, next) => {
-    const { pathname } = req;
-    if (pathname !== '/logout') {
-      next();
-      return;
-    }
-
-    const { sessionId } = req.cookies;
-    delete sessions[sessionId];
-    res.setHeader('Set-Cookie', `sessionId=0;Max-age=0`)
-    redirectLoginPage(res);
-    res.end();
-    return;
-  };
-};
-
-module.exports = { createLoginHandler, injectSession, createLogoutHandler };
+module.exports = { createLoginHandler, injectSession };

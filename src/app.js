@@ -1,11 +1,12 @@
 const { serveApiPage } = require('./app/apiHandler.js');
 const { serveGuestPage } = require('./app/guestBookHandler.js');
-const { createLoginHandler, injectSession, logOutHandler, createLogoutHandler } = require('./app/sessionHandler.js');
+const { createLoginHandler, injectSession } = require('./app/sessionHandler.js');
 const { notFound } = require('./app/notFoundHandler.js');
 const { injectParams } = require('./app/parseParams.js');
 const { serveStatic } = require('./app/serveStatic.js');
 const { createRouter } = require("./server/router");
 const { injectCookies } = require('./app/injectCookies.js');
+const { createLogoutHandler } = require('./app/logoutHandler.js');
 
 const sessions = {};
 const handlers = [
