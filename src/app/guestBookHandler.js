@@ -15,9 +15,9 @@ const redirectLoginPage = (res) => {
 };
 
 const writeGuestBook = (req, res) => {
-  const { guestBook, params, guestFile, session } = req;
+  const { guestBook, bodyParams, guestFile, session } = req;
   const name = session.username;
-  const { comment } = params;
+  const { comment } = bodyParams;
 
   const date = new Date().toLocaleString();
   guestBook.addComment({ name, comment, date });

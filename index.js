@@ -1,10 +1,9 @@
 const http = require('http');
+const { router } = require('./src/app.js');
 
-const { reqHandler } = require('./src/app.js');
-
-const startServer = (PORT, requestHandler) => {
-  const server = http.createServer(requestHandler);
+const startServer = (PORT, router) => {
+  const server = http.createServer(router);
   server.listen(PORT, () => console.log(`listening on http://localhost:${PORT}`));
 };
 
-startServer(8181, reqHandler);
+startServer(8181, router);

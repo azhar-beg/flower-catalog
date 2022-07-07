@@ -8,7 +8,7 @@ const createSignupHandler = (users) => {
       return;
     }
 
-    const { username, password } = req.params;
+    const { username, password } = req.bodyParams;
     users[username] = { username, password };
     redirectLoginPage(res);
     res.end()

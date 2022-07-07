@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/azhar-beg/flower-catalog/issues"
   },
-  "homepage": "https://github.com/azhar-beg/flower-catalog#readme"
+  "homepage": "https://github.com/azhar-beg/flower-catalog#readme",
+  "dependencies": {
+    "handlers": "github:azhar-beg/handlers",
+    "http-server": "github:azhar-beg/serverm"
+  }
 }

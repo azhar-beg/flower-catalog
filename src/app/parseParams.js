@@ -5,7 +5,8 @@ const injectParams = (req, res, next) => {
     let data = '';
     req.on('data', chunk => data += chunk);
     req.on('end', () => {
-      req.params = getParams(new URLSearchParams(data));
+      req.body = data;
+      req.bodyParams = getParams(new URLSearchParams(data));
       req.pathname = req.url.pathname
       next();
     })

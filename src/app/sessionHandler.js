@@ -21,8 +21,8 @@ const doesUserExist = (users, username, password) => {
 };
 
 const sessionsHandler = (req, res) => {
-  const { users, params } = req;
-  const { username, password } = params;
+  const { users, bodyParams } = req;
+  const { username, password } = bodyParams;
 
   if (!doesUserExist(users, username, password)) {
     redirectLoginPage(res);
@@ -38,13 +38,6 @@ const sessionsHandler = (req, res) => {
   redirectToGuestBook(res);
   return;
 }
-
-
-const serveLoginPage = (req, res) => {
-  res.setHeader('content-type', 'text/html')
-  res.end(req.loginForm);
-  return;
-};
 
 const createLoginHandler = (sessions, users) => {
   return (req, res, next) => {
