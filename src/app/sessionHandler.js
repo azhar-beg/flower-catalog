@@ -1,4 +1,4 @@
-const { redirectToGuestBook, isSessionExist, redirectLoginPage } = require("./guestBookHandler");
+const { redirectToGuestBook, redirectLoginPage } = require("./guestBookHandler");
 
 const loginForm = `<html lang="en">
 
@@ -67,30 +67,13 @@ const injectSession = sessions => {
   }
 }
 
-const parseCookies = (rawCookies) => {
-  if (!rawCookies) {
-    return;
-  }
-
-  const cookies = {};
-  rawCookies.split(';').forEach(cookie => {
-    const [key, value] = cookie.split('=');
-    cookies[key] = value;
-  })
-  return cookies;
-};
-
-const injectCookies = (req, res, next) => {
-  req.cookies = parseCookies(req.headers.cookie)
-  next()
-};
-
 const loginHandler = (req, res, next) => {
   const { pathname } = req;
   if (pathname !== '/login') {
     next();
     return;
   }
+
   const { username, password } = req.params;
   if (req.method === 'POST') {
     if (!doesUserExist(username, password)) {
@@ -109,6 +92,7 @@ const loginHandler = (req, res, next) => {
     res.end(loginForm);
     return;
   }
+
   next();
 };
 
@@ -118,10 +102,11 @@ const logOutHandler = (req, res, next) => {
     next();
     return;
   }
+
   res.setHeader('Set-Cookie', `sessionId=0;Max-age=0`)
   redirectToGuestBook(res);
   res.end();
   return;
 };
 
-module.exports = { loginHandler, injectSession, injectCookies, logOutHandler, createSessionsHandler };
+module.exports = { loginHandler, injectSession, logOutHandler, createSessionsHandler };
