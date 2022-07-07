@@ -1,5 +1,4 @@
 const { redirectToGuestBook, redirectLoginPage } = require("./guestBookHandler");
-const fs = require('fs');
 
 const injectSession = sessions => {
   return (req, res, next) => {
