@@ -1,59 +1,5 @@
 const { redirectToGuestBook, redirectLoginPage } = require("./guestBookHandler");
-
-const loginForm = `<html lang="en">
-
-<head>
-  <title>Login</title>
-</head>
-
-<body>
-  <form action="/login" method="post">
-    <div>
-      <label for="username">Enter Your Name</label>
-      <input type="text" name="username" id="">
-    </div>
-    <div>
-      <label for="username">Enter Your Password</label>
-      <input type="password" name="password" id="">
-    </div>
-    <input type="submit" value="Login">
-  </form>
-</body>
-
-</html>`
-
-const doesUserExist = (username, password) => {
-  const users = [
-    { username: 'azhar', password: 'azhar' },
-    { username: 'suresh', password: 'suresh' },
-    { username: 'abin', password: 'abin' },
-    { username: 'rishabh', password: 'rishabh' },
-  ];
-  return users.some(user => {
-    return user.username === username && user.password === password;
-  });
-};
-
-const createSessionsHandler = sessions => {
-  return (req, res, next) => {
-    const { pathname } = req;
-    if (pathname !== '/login') {
-      next();
-      return;
-    }
-
-    const { username } = req.params;
-    if (req.method === 'POST') {
-      const time = new Date();
-      const sessionId = time.getTime();
-      const session = { username, time, sessionId };
-      sessions[sessionId] = session;
-      res.setHeader('Set-Cookie', `sessionId=${sessionId}`);
-      redirectToGuestBook(res);
-      return;
-    }
-  }
-};
+const fs = require('fs');
 
 const injectSession = sessions => {
   return (req, res, next) => {
@@ -67,46 +13,82 @@ const injectSession = sessions => {
   }
 }
 
-const loginHandler = (req, res, next) => {
-  const { pathname } = req;
-  if (pathname !== '/login') {
-    next();
-    return;
-  }
-
-  const { username, password } = req.params;
-  if (req.method === 'POST') {
-    if (!doesUserExist(username, password)) {
-      redirectLoginPage(res)
-      return;
-    }
-  }
-
-  if (req.session) {
-    redirectToGuestBook(res);
-    return;
-  }
-
-  if (req.method === 'GET') {
-    res.setHeader('content-type', 'text/html')
-    res.end(loginForm);
-    return;
-  }
-
-  next();
+const doesUserExist = (username, password) => {
+  const users = [
+    { username: 'azhar', password: 'azhar' },
+    { username: 'suresh', password: 'suresh' },
+    { username: 'abin', password: 'abin' },
+    { username: 'rishabh', password: 'rishabh' },
+  ];
+  return users.some(user => {
+    return user.username === username && user.password === password;
+  });
 };
 
-const logOutHandler = (req, res, next) => {
-  const { pathname } = req;
-  if (pathname !== '/logout') {
-    next();
+const sessionsHandler = (req, res) => {
+  const { username, password } = req.params;
+  if (!doesUserExist(username, password)) {
+    redirectLoginPage(res);
     return;
   }
 
-  res.setHeader('Set-Cookie', `sessionId=0;Max-age=0`)
+  const sessions = req.sessions;
+  const time = new Date();
+  const sessionId = time.getTime();
+  const session = { username, time, sessionId };
+  sessions[sessionId] = session;
+  res.setHeader('Set-Cookie', `sessionId=${sessionId}`);
   redirectToGuestBook(res);
-  res.end();
+  return;
+}
+
+
+const serveLoginPage = (req, res) => {
+  const loginForm = fs.readFileSync(req.formTemplate);
+  res.setHeader('content-type', 'text/html')
+  res.end(loginForm);
   return;
 };
 
-module.exports = { loginHandler, injectSession, logOutHandler, createSessionsHandler };
+const createLoginHandler = (sessions, loginFormFile) => {
+  return (req, res, next) => {
+    const { pathname } = req;
+    if (pathname !== '/login') {
+      next();
+      return;
+    }
+
+    if (req.session) {
+      redirectToGuestBook(res);
+      return;
+    }
+
+    if (req.method === 'GET') {
+      req.formTemplate = loginFormFile;
+      serveLoginPage(req, res);
+      return;
+    }
+
+    req.sessions = sessions;
+    sessionsHandler(req, res);
+  };
+};
+
+const createLogoutHandler = sessions => {
+  return (req, res, next) => {
+    const { pathname } = req;
+    if (pathname !== '/logout') {
+      next();
+      return;
+    }
+
+    const { sessionId } = req.cookies;
+    delete sessions[sessionId];
+    res.setHeader('Set-Cookie', `sessionId=0;Max-age=0`)
+    redirectLoginPage(res);
+    res.end();
+    return;
+  };
+};
+
+module.exports = { createLoginHandler, injectSession, createLogoutHandler };
