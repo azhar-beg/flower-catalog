@@ -14,7 +14,7 @@ const loginForm = `<html lang="en">
     </div>
     <div>
       <label for="username">Enter Your Password</label>
-      <input type="text" name="password" id="">
+      <input type="password" name="password" id="">
     </div>
     <input type="submit" value="Login">
   </form>
@@ -34,9 +34,35 @@ const doesUserExist = (username, password) => {
   });
 };
 
+const createSessionsHandler = sessions => {
+  return (req, res, next) => {
+    const { pathname } = req;
+    if (pathname !== '/login') {
+      next();
+      return;
+    }
+
+    const { username } = req.params;
+    if (req.method === 'POST') {
+      const time = new Date();
+      const sessionId = time.getTime();
+      const session = { username, time, sessionId };
+      sessions[sessionId] = session;
+      res.setHeader('Set-Cookie', `sessionId=${sessionId}`);
+      redirectToGuestBook(res);
+      return;
+    }
+  }
+};
+
 const injectSession = sessions => {
   return (req, res, next) => {
-    req.sessions = sessions;
+    if (!req.cookies) {
+      next();
+      return
+    }
+    const { sessionId } = req.cookies;
+    req.session = sessions[sessionId];
     next();
   }
 }
@@ -45,6 +71,7 @@ const parseCookies = (rawCookies) => {
   if (!rawCookies) {
     return;
   }
+
   const cookies = {};
   rawCookies.split(';').forEach(cookie => {
     const [key, value] = cookie.split('=');
@@ -64,7 +91,6 @@ const loginHandler = (req, res, next) => {
     next();
     return;
   }
-
   const { username, password } = req.params;
   if (req.method === 'POST') {
     if (!doesUserExist(username, password)) {
@@ -73,24 +99,17 @@ const loginHandler = (req, res, next) => {
     }
   }
 
-  if (req.method === 'POST') {
-    const time = new Date();
-    const sessionId = time.getTime();
-    const session = { username, time, sessionId };
-    req.sessions[sessionId] = session;
-    res.setHeader('Set-Cookie', `sessionId=${sessionId}`);
+  if (req.session) {
     redirectToGuestBook(res);
     return;
   }
 
-  if (isSessionExist(req)) {
-    redirectToGuestBook(res);
+  if (req.method === 'GET') {
+    res.setHeader('content-type', 'text/html')
+    res.end(loginForm);
     return;
   }
-
-  res.setHeader('content-type', 'text/html')
-  res.end(loginForm);
-  return
+  next();
 };
 
 const logOutHandler = (req, res, next) => {
@@ -105,4 +124,4 @@ const logOutHandler = (req, res, next) => {
   return;
 };
 
-module.exports = { loginHandler, injectSession, injectCookies, logOutHandler };
+module.exports = { loginHandler, injectSession, injectCookies, logOutHandler, createSessionsHandler };

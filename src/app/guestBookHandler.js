@@ -2,16 +2,6 @@ const { writeContent } = require('../lib.js');
 const { createHtml } = require("./guestBookHtml.js");
 const { readComments } = require("./readComments.js");
 
-const isSessionExist = (req) => {
-  const { sessions, cookies } = req;
-  if (!cookies) {
-    return false;
-  }
-  const { sessionId } = cookies;
-  return sessionId && sessions[sessionId];
-};
-
-
 const redirectToGuestBook = (res) => {
   res.statusCode = 302;
   res.setHeader('location', '/guest-book');
@@ -25,9 +15,8 @@ const redirectLoginPage = (res) => {
 };
 
 const writeGuestBook = (req, res) => {
-  const { guestBook, params, guestFile, sessions, cookies } = req;
-  const { sessionId } = cookies;
-  const name = sessions[sessionId].username;
+  const { guestBook, params, guestFile, session } = req;
+  const name = session.username;
   const { comment } = params;
 
   const date = new Date().toLocaleString();
@@ -49,7 +38,7 @@ const serveGuestPage = guestFile => {
   const guestBook = readComments(guestFile);
   return (req, res, next) => {
     const { pathname, method } = req;
-    if (pathname !== '/guest-book') {
+    if (pathname !== '/guest-book' && pathname !== '/add-comment') {
       next()
       return;
     }
@@ -62,7 +51,7 @@ const serveGuestPage = guestFile => {
       return;
     }
 
-    if (!isSessionExist(req)) {
+    if (!req.session) {
       redirectLoginPage(res);
       return;
     }
@@ -72,4 +61,4 @@ const serveGuestPage = guestFile => {
   }
 }
 
-module.exports = { serveGuestPage, redirectToGuestBook, isSessionExist, redirectLoginPage };
+module.exports = { serveGuestPage, redirectToGuestBook, redirectLoginPage };
