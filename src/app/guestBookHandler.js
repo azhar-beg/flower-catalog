@@ -1,4 +1,5 @@
 const { writeContent } = require('../lib.js');
+const { serveApiPage } = require('./apiHandler.js');
 const { createHtml } = require("./guestBookHtml.js");
 const { readComments } = require("./readComments.js");
 
@@ -18,9 +19,10 @@ const writeGuestBook = (req, res) => {
   const { guestBook, bodyParams, guestFile, session } = req;
   const name = session.username;
   const { comment } = bodyParams;
+  const id = (guestBook.latestCommentId() || 0) + 1;
 
   const date = new Date().toLocaleString();
-  guestBook.addComment({ name, comment, date });
+  guestBook.addComment({ name, comment, date, id });
   writeContent(guestBook.getComments(), guestFile);
 }
 
@@ -38,26 +40,31 @@ const serveGuestPage = guestFile => {
   const guestBook = readComments(guestFile);
   return (req, res, next) => {
     const { pathname, method } = req;
-    if (pathname !== '/guest-book' && pathname !== '/add-comment') {
-      next()
-      return;
-    }
-
-    if (method === 'POST') {
+    if (method === 'POST' && pathname === '/add-comment') {
       req.guestBook = guestBook;
       req.guestFile = guestFile;
       saveComments(req, res);
-      redirectToGuestBook(res);
+      res.end();
       return;
     }
 
-    if (!req.session) {
+    if (!req.session && pathname === '/guest-book') {
       redirectLoginPage(res);
       return;
     }
 
-    req.guestBook = guestBook;
-    showGuestPage(req, res);
+    if (pathname === '/guest-book' && method === 'GET') {
+      req.guestBook = guestBook;
+      showGuestPage(req, res);
+      return;
+    }
+
+    if (pathname.startsWith('/api')) {
+      req.guestBook = guestBook;
+      serveApiPage(req, res, next);
+      return;
+    }
+    next();
   }
 }
 

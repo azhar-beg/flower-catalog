@@ -4,7 +4,6 @@ const {
   commentKeyInstruction
 } = require("../lib.js");
 
-const { readComments } = require("./readComments.js");
 
 const serveInstruction = (req, res) => {
   const url = urlInstruction();
@@ -31,22 +30,24 @@ const serveApi = (req, res) => {
   }
 };
 
-const serveApiPage = guestFile => {
-  const guestBook = readComments(guestFile);
-  return (req, res, next) => {
-    const { pathname, method } = req;
-    if (pathname === '/api-page' && method === 'GET') {
-      serveInstruction(req, res);
-      return;
-    }
-
-    if (pathname === '/api' && method === 'GET') {
-      req.guestBook = guestBook
-      serveApi(req, res);
-      return;
-    }
-    next();
+const serveApiPage = (req, res, next) => {
+  const { pathname, method } = req;
+  if (pathname === '/api-page' && method === 'GET') {
+    serveInstruction(req, res);
+    return;
   }
-}
+
+  if (pathname === '/api/all' && method === 'GET') {
+    res.end(req.guestBook.getComments());
+    return;
+  }
+
+  if (pathname === '/api' && method === 'GET') {
+    req.guestBook = guestBook
+    serveApi(req, res);
+    return;
+  }
+  next();
+};
 
 module.exports = { serveApiPage }

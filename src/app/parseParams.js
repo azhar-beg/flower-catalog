@@ -1,6 +1,7 @@
 const { getParams } = require("../lib");
 
 const injectParams = (req, res, next) => {
+  req.bodyParams = {};
   if (req.method === 'POST') {
     let data = '';
     req.on('data', chunk => data += chunk);

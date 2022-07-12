@@ -1,4 +1,3 @@
-const { serveApiPage } = require('./app/apiHandler.js');
 const { serveGuestPage } = require('./app/guestBookHandler.js');
 const { createLoginHandler, injectSession } = require('./app/sessionHandler.js');
 const { notFoundHandler } = require('handlers');
@@ -26,7 +25,6 @@ const handlers = [
   createSignupHandler(users),
   createLogoutHandler(sessions),
   serveGuestPage('./data/comments.json'),
-  serveApiPage('./data/comments.json'),
   serveStatic('./public'),
   notFoundHandler
 ];

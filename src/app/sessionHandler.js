@@ -23,7 +23,6 @@ const doesUserExist = (users, username, password) => {
 const sessionsHandler = (req, res) => {
   const { users, bodyParams } = req;
   const { username, password } = bodyParams;
-
   if (!doesUserExist(users, username, password)) {
     redirectLoginPage(res);
     return;
@@ -51,7 +50,6 @@ const createLoginHandler = (sessions, users) => {
       redirectToGuestBook(res);
       return;
     }
-
     req.users = users;
     req.sessions = sessions;
     sessionsHandler(req, res);

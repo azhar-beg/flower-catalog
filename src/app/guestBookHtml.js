@@ -1,11 +1,11 @@
 const fs = require('fs');
 
-const generateDiv = (content, style = '') => `<div class="${style}">${content}</div>`;
+const generateDiv = (content, style = '', id = '') => `<div id=${id} class="${style}">${content}</div>`;
 
-const commentHtml = ({ name, date, comment }) => generateDiv(
+const commentHtml = ({ name, date, comment, id }) => generateDiv(
   generateDiv(date, 'date') +
   generateDiv(name, 'name') +
-  generateDiv(comment, 'message'), 'comment'
+  generateDiv(comment, 'message'), 'comment', id
 );
 
 const guestBookHtml = (comments) => {

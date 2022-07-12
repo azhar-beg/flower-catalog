@@ -2,6 +2,7 @@
 
 <head>
   <title>Form</title>
+  <script src="js/guest-book.js"></script>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 
@@ -11,16 +12,15 @@
       <h1><a href="/home.html">&lt;&lt;</a>Guest Book</h1>
     </header>
     <h2>Leave a comment</h2>
-    <form action="/add-comment" method="post">
+    <form action="#" method="post">
       <div>
         <label for="comment">Comment: </label>
         <textarea name="comment" cols="30" rows="10"></textarea>
       </div>
-      <div>
-        <input type="submit">
-      </div>
     </form>
-    <div class="comment-list">__COMMENTS__</div>
+    <!-- <button id="submit">Submit</button> -->
+    <input id="submit" type="button" value="Submit"></input>
+    <div class="comment-list" id="comments">__COMMENTS__</div>
     <a href="/logout">logout</a>
     <div>
     </div>
