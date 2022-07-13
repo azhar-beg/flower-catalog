@@ -45,7 +45,6 @@ const createLoginHandler = (sessions, users) => {
       next();
       return;
     }
-
     if (req.session) {
       redirectToGuestBook(res);
       return;

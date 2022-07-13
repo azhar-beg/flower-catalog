@@ -8,26 +8,19 @@ const { injectCookies } = require('handlers');
 const { createLogoutHandler } = require('./app/logoutHandler.js');
 const { createSignupHandler } = require('./app/signupHandler.js');
 
-const sessions = {};
-
-const users = {
-  azhar: { username: 'azhar', password: 'azhar' },
-  suresh: { username: 'suresh', password: 'suresh' },
-  abin: { username: 'abin', password: 'abin' },
-  rishabh: { username: 'rishabh', password: 'rishabh' },
+const app = config => {
+  const handlers = [
+    injectParams,
+    injectCookies,
+    injectSession(config.sessions),
+    createLoginHandler(config.sessions, config.users),
+    createSignupHandler(config.users),
+    createLogoutHandler(config.sessions),
+    serveGuestPage(config.comments, config.read, config.persist, config.guestTemp),
+    serveStatic(config.publicDir),
+    notFoundHandler
+  ];
+  return createRouter(...handlers)
 };
 
-const handlers = [
-  injectParams,
-  injectCookies,
-  injectSession(sessions),
-  createLoginHandler(sessions, users, './templates/login.html'),
-  createSignupHandler(users),
-  createLogoutHandler(sessions),
-  serveGuestPage('./data/comments.json'),
-  serveStatic('./public'),
-  notFoundHandler
-];
-
-const router = createRouter(...handlers);
-module.exports = { router };
+module.exports = { app };

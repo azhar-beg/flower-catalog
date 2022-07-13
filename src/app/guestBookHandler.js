@@ -1,4 +1,3 @@
-const { writeContent } = require('../lib.js');
 const { serveApiPage } = require('./apiHandler.js');
 const { createHtml } = require("./guestBookHtml.js");
 const { readComments } = require("./readComments.js");
@@ -6,13 +5,13 @@ const { readComments } = require("./readComments.js");
 const redirectToGuestBook = (res) => {
   res.statusCode = 302;
   res.setHeader('location', '/guest-book');
-  res.end();
+  res.end('redirected to /guest-book');
 };
 
 const redirectLoginPage = (res) => {
   res.statusCode = 302;
   res.setHeader('location', '/login.html');
-  res.end();
+  res.end('redirected to /login.html');
 };
 
 const writeGuestBook = (req, res) => {
@@ -23,12 +22,12 @@ const writeGuestBook = (req, res) => {
 
   const date = new Date().toLocaleString();
   guestBook.addComment({ name, comment, date, id });
-  writeContent(guestBook.getComments(), guestFile);
+  req.persist(guestBook.getComments(), guestFile);
 }
 
 const showGuestPage = (req, res) => {
   const { guestBook } = req;
-  res.end(createHtml(guestBook.getComments()));
+  res.end(createHtml(guestBook.getComments(), req.template));
 };
 
 const saveComments = function (req, res) {
@@ -36,13 +35,14 @@ const saveComments = function (req, res) {
   writeGuestBook(req, res);
 };
 
-const serveGuestPage = guestFile => {
-  const guestBook = readComments(guestFile);
+const serveGuestPage = (guestFile, reader, persist, template) => {
+  const guestBook = readComments(guestFile, reader);
   return (req, res, next) => {
     const { pathname, method } = req;
     if (method === 'POST' && pathname === '/add-comment') {
       req.guestBook = guestBook;
       req.guestFile = guestFile;
+      req.persist = persist;
       saveComments(req, res);
       res.end();
       return;
@@ -55,6 +55,7 @@ const serveGuestPage = guestFile => {
 
     if (pathname === '/guest-book' && method === 'GET') {
       req.guestBook = guestBook;
+      req.template = reader(template)
       showGuestPage(req, res);
       return;
     }

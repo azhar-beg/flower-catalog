@@ -23,5 +23,8 @@
   "dependencies": {
     "handlers": "github:azhar-beg/handlers",
     "http-server": "github:azhar-beg/serverm"
+  },
+  "devDependencies": {
+    "supertest": "^6.2.4"
   }
 }

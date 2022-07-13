@@ -1,9 +1,3 @@
-const fs = require('fs');
-
-const writeContent = function (content, file) {
-  fs.writeFileSync(file, content, 'utf8');
-}
-
 const getParams = searchParams => {
   const params = {};
   for ([key, value] of searchParams.entries()) {
@@ -18,4 +12,4 @@ const commentKeyInstruction = () => "<div>key:comment -> get comments with speci
 
 const instructions = { urlInstruction, nameKeyInstruction, commentKeyInstruction }
 
-module.exports = { writeContent, getParams, ...instructions };
+module.exports = { getParams, ...instructions };

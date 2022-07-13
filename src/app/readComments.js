@@ -1,16 +1,16 @@
 const fs = require('fs');
 const { GuestBook } = require('./guestBook.js');
 
-const readJSON = (file) => {
+const readJSON = (file, read) => {
   try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
+    return JSON.parse(read(file));
   } catch (error) {
     return;
   }
 };
 
-const readComments = (fileName) => {
-  const commentList = readJSON(fileName)?.reverse() || [];
+const readComments = (fileName, reader) => {
+  const commentList = readJSON(fileName, reader)?.reverse() || [];
   const guestBook = new GuestBook();
   commentList.forEach((comment) => {
     guestBook.addComment(comment);
