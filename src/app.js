@@ -8,17 +8,17 @@ const { injectCookies } = require('handlers');
 const { createLogoutHandler } = require('./app/logoutHandler.js');
 const { createSignupHandler } = require('./app/signupHandler.js');
 
-const app = config => {
+const app = (config, fileOperation, userDetails) => {
   const handlers = [
     injectParams,
     injectCookies,
-    injectSession(config.sessions),
-    createLoginHandler(config.sessions, config.users),
-    createSignupHandler(config.users),
-    createLogoutHandler(config.sessions),
-    serveGuestPage(config.comments, config.read, config.persist, config.guestTemp),
+    injectSession(userDetails),
+    createLoginHandler(userDetails, config, fileOperation),
+    createSignupHandler(userDetails, config, fileOperation,),
+    createLogoutHandler(userDetails),
+    serveGuestPage(config, fileOperation),
     serveStatic(config.publicDir),
-    notFoundHandler
+    notFoundHandler,
   ];
   return createRouter(...handlers)
 };

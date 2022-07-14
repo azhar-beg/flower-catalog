@@ -1,6 +1,6 @@
 const { redirectLoginPage } = require("./guestBookHandler");
 
-const createLogoutHandler = sessions => {
+const createLogoutHandler = ({ sessions }) => {
   return (req, res, next) => {
     const { pathname } = req;
     if (pathname !== '/logout') {

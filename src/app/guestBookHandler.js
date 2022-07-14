@@ -35,37 +35,41 @@ const saveComments = function (req, res) {
   writeGuestBook(req, res);
 };
 
-const serveGuestPage = (guestFile, reader, persist, template) => {
-  const guestBook = readComments(guestFile, reader);
+const serveGuestPage = ({ guestFile, guestTemplate }, { read, persist }) => {
+  const guestBook = readComments(guestFile, read);
   return (req, res, next) => {
     const { pathname, method } = req;
-    if (method === 'POST' && pathname === '/add-comment') {
-      req.guestBook = guestBook;
-      req.guestFile = guestFile;
-      req.persist = persist;
-      saveComments(req, res);
-      res.end();
-      return;
-    }
-
-    if (!req.session && pathname === '/guest-book') {
-      redirectLoginPage(res);
-      return;
-    }
-
-    if (pathname === '/guest-book' && method === 'GET') {
-      req.guestBook = guestBook;
-      req.template = reader(template)
-      showGuestPage(req, res);
-      return;
-    }
-
     if (pathname.startsWith('/api')) {
       req.guestBook = guestBook;
       serveApiPage(req, res, next);
       return;
     }
-    next();
+
+    if (pathname !== '/guest-book' && pathname !== '/add-comment') {
+      next();
+      return;
+    }
+
+    if (!req.session) {
+      redirectLoginPage(res);
+      return;
+    }
+
+    if (method === 'POST') {
+      req.guestBook = guestBook;
+      req.guestFile = guestFile;
+      req.persist = persist;
+      saveComments(req, res);
+      res.end('comment added');
+      return;
+    }
+
+    if (method === 'GET') {
+      req.guestBook = guestBook;
+      req.template = read(guestTemplate)
+      showGuestPage(req, res);
+      return;
+    }
   }
 }
 

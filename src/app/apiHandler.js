@@ -43,7 +43,6 @@ const serveApiPage = (req, res, next) => {
   }
 
   if (pathname === '/api' && method === 'GET') {
-    req.guestBook = guestBook
     serveApi(req, res);
     return;
   }

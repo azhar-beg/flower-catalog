@@ -1,13 +1,17 @@
 const login = (xhr, event) => {
-  xhr.open('POST', '/login');
+  xhr.open('POST', '/signup');
   xhr.onload = () => {
-    if (xhr.status === 401) {
+    if (xhr.status === 409) {
       const message = document.querySelector('#message')
-      message.innerText = 'invalid username or password';
+      message.innerText = 'username is not available';
       return;
     }
     if (xhr.status === 200) {
-      window.location.href = '/guest-book';
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 3000)
+      const message = document.querySelector('#message')
+      message.innerText = 'created account successfully';
     }
   };
   const form = document.querySelector('form')
@@ -17,7 +21,7 @@ const login = (xhr, event) => {
 
 const main = () => {
   const xhr = new XMLHttpRequest();
-  const button = document.querySelector('#login');
+  const button = document.querySelector('#signup');
   button.addEventListener('click', (event) => {
     login(xhr, event)
   });
