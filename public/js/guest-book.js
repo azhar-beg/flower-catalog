@@ -31,7 +31,7 @@ const generateHtml = (comments) => {
 
 const displayComment = () => {
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', '/api/all');
+  xhr.open('GET', '/api');
   xhr.onload = () => {
     if (xhr.status === 200) {
       generateHtml(getComments(xhr));
@@ -64,7 +64,7 @@ const main = () => {
   button.addEventListener('click', (event) => {
     addComments(event);
   });
-  // setInterval(displayComment, 200);
+  setInterval(displayComment, 200);
 };
 
 window.onload = main;

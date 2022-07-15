@@ -182,7 +182,7 @@ describe('app', () => {
     it('should send api', (done) => {
       config.guestFile = '[{"name":"ab","comment":"cool","date":"13","id":1}]';
       request(createApp(config, fileOperation, userDetails))
-        .get('/api/all')
+        .get('/api')
         .send('username=ab&password=ab')
         .set('cookie', ['sessionId=123'])
         .expect('[{"name":"ab","comment":"cool","date":"13","id":1}]')

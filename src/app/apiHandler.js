@@ -1,3 +1,4 @@
+const express = require('express')
 const {
   urlInstruction,
   nameKeyInstruction,
@@ -24,29 +25,29 @@ const selectComments = (name, comment, guestBook) => {
 
 const serveApi = (req, res) => {
   const { name, comment } = req.params;
+  if (!(name || comment)) {
+    res.end((req.guestBook.getComments()));
+    return;
+  }
+
   if (name && comment) {
     const comments = selectComments(name, comment, req.guestBook);
-    res.end(JSON.stringify(comments));
+    res.JSON(comments);
   }
 };
 
-const createApiHandler = guestBook => {
-  return (req, res) => {
-    const { url, method } = req;
-    if (url === '/api-page' && method === 'GET') {
-      serveInstruction(req, res);
-      return;
-    }
+const createApiRouter = (guestBook) => {
+  const router = express.Router();
+  router.get('/instruction', (req, res) => {
+    serveInstruction(req, res);
+  });
 
-    if (url === '/api/all' && method === 'GET') {
-      res.end((guestBook.getComments()));
-      return;
-    }
+  router.get('/', ((guestBook) => (req, res) => {
+    req.guestBook = guestBook;
+    serveApi(req, res);
+  })(guestBook));
+  return router;
+};
 
-    if (url === '/api' && method === 'GET') {
-      serveApi(req, res);
-      return;
-    }
-  };
-}
-module.exports = { createApiHandler }
+
+module.exports = { createApiRouter }
