@@ -1,4 +1,4 @@
-const { app } = require('../src/app.js');
+const { createApp } = require('../src/app.js');
 const request = require('supertest');
 const fs = require('fs');
 const assert = require('assert');
@@ -14,6 +14,7 @@ describe('app', () => {
   let config = {};
   let fileOperation = {};
   let userDetails = {};
+  let app;
   beforeEach(() => {
     config = {
       publicDir: './public',
@@ -30,17 +31,16 @@ describe('app', () => {
 
   describe('path: /error ', () => {
     it('should send error for GET', (done) => {
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/error')
         .expect(404)
-        .expect('content-length', '37')
-        .expect('<html><body>Bad Request</body></html>', done)
+        .expect('content-length', '144', done)
     });
   });
 
   describe('path: / ', () => {
     it('should send home page for GET', (done) => {
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/')
         .expect(200)
         .expect('content-type', /html/)
@@ -50,11 +50,10 @@ describe('app', () => {
 
   describe('path: /login', () => {
     it('should send login page for GET', (done) => {
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/login')
-        .expect(302)
-        .expect('location', '/login.html')
-        .expect('redirected to /login.html', done)
+        .expect(200)
+        .expect(/.*login/, done)
     });
 
     it('should redirect to /guest-book if session exist', (done) => {
@@ -62,17 +61,17 @@ describe('app', () => {
       config.userFile = JSON.stringify({
         ab: { username: 'ab', password: 'ab' },
       });
-      request(app(config, fileOperation, userDetails))
+      userDetails.users.ab = { username: 'ab', password: 'ab' };
+      request(createApp(config, fileOperation, userDetails))
         .post('/login')
         .set('cookie', ['sessionId=123'])
-        .expect('redirected to /guest-book')
         .expect('location', '/guest-book')
         .expect(302, done)
     });
 
     it('should redirect to /guest-book after user logged in', (done) => {
       userDetails.users = { ab: { username: 'ab', password: 'ab' } };
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .post('/login')
         .send('username=ab&password=ab')
         .expect('redirect to /guest-book')
@@ -82,11 +81,10 @@ describe('app', () => {
 
   describe('path: /guest-book', () => {
     it('should send login page for GET if session does not exist', (done) => {
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/guest-book')
         .expect(302)
-        .expect('location', '/login.html')
-        .expect('redirected to /login.html', done)
+        .expect('location', '/login.html', done)
     });
 
     it('should show guest-book for GET if user logged in', (done) => {
@@ -95,7 +93,7 @@ describe('app', () => {
         ab: { username: 'ab', password: 'ab' },
       });
       config.guestFile = '[{"name":"ab","comment":"cool","date":"13","id":1}]';
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/guest-book')
         .set('cookie', ['sessionId=123'])
         .expect(/13.*ab.*cool/)
@@ -104,7 +102,7 @@ describe('app', () => {
 
   });
 
-  describe('path: /add-comment', () => {
+  describe('path: /guest-book', () => {
     it('should save comment for POST ', (done) => {
       const content = [];
       userDetails.sessions = { 123: { username: 'ab', time: 1, sessionId: 123 } };
@@ -112,8 +110,8 @@ describe('app', () => {
 
       const date = new Date().toLocaleString();
       const expectedContent = [JSON.stringify([{ name: "ab", comment: 'nice', date: `${date}`, id: 1 }])];
-      request(app(config, fileOperation, userDetails))
-        .post('/add-comment')
+      request(createApp(config, fileOperation, userDetails))
+        .post('/guest-book')
         .send('comment=nice')
         .set('cookie', ['sessionId=123'])
         .expect('comment added')
@@ -128,11 +126,10 @@ describe('app', () => {
   describe('path: /logout', () => {
     it('Should logout user and redirect to login page', (done) => {
       userDetails.sessions = { 123: { username: 'ab', time: 1, sessionId: 123 } };
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/logout')
         .set('cookie', ['sessionId=123'])
-        .expect('redirected to /login.html')
-        .expect(302,)
+        .expect(302)
         .expect(/login/)
         .end((err, res) => {
           done(err);
@@ -145,18 +142,15 @@ describe('app', () => {
     it('Should register new user', (done) => {
       const content = [];
       fileOperation.persist = mockPersist(content);
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .post('/signup')
         .send('username=ab&password=ab')
-        .set('cookie', ['sessionId=123'])
         .end((err, res) => {
           assert.strictEqual(res.header.location, '/login.html');
-          assert.strictEqual(res.text, 'redirected to /login.html');
           assert.strictEqual(res.statusCode, 302);
-          request(app(config, fileOperation, userDetails))
+          request(createApp(config, fileOperation, userDetails))
             .post('/login')
             .send('username=ab&password=ab')
-            .set('cookie', ['sessionId=123'])
             .expect('redirect to /guest-book')
             .expect(200, done)
         })
@@ -168,14 +162,13 @@ describe('app', () => {
         username: 'ab',
         password: 'ab'
       }
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .post('/signup')
         .send('username=ab&password=abc')
-        .set('cookie', ['sessionId=123'])
         .end((err, res) => {
           assert.strictEqual(res.text, 'conflict');
           assert.strictEqual(res.statusCode, 409);
-          request(app(config, fileOperation, userDetails))
+          request(createApp(config, fileOperation, userDetails))
             .post('/login')
             .send('username=ab&password=abc')
             .set('cookie', ['sessionId=123'])
@@ -188,7 +181,7 @@ describe('app', () => {
   describe('path: /api', () => {
     it('should send api', (done) => {
       config.guestFile = '[{"name":"ab","comment":"cool","date":"13","id":1}]';
-      request(app(config, fileOperation, userDetails))
+      request(createApp(config, fileOperation, userDetails))
         .get('/api/all')
         .send('username=ab&password=ab')
         .set('cookie', ['sessionId=123'])

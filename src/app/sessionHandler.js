@@ -1,5 +1,3 @@
-const { redirectToGuestBook, redirectLoginPage } = require("./guestBookHandler");
-
 const injectSession = ({ sessions }) => {
   return (req, res, next) => {
     if (!req.cookies) {
@@ -21,38 +19,28 @@ const doesUserExist = (users, username, password) => {
 };
 
 const sessionsHandler = (req, res) => {
-  const { users, bodyParams } = req;
-  const { username, password } = bodyParams;
+  const { users, body } = req;
+  const { username, password } = body;
   if (!doesUserExist(users, username, password)) {
-    res.statusCode = 401;
+    res.status(401);
     res.end('invalid credential');
     return;
   }
+
   const sessions = req.sessions;
   const time = new Date();
   const sessionId = time.getTime();
   const session = { username, time, sessionId };
   sessions[sessionId] = session;
-  res.setHeader('Set-Cookie', `sessionId=${sessionId}`);
+  res.cookie('sessionId', sessionId);
   res.end('redirect to /guest-book');
   return;
 }
 
 const createLoginHandler = ({ sessions, users }) => {
-  return (req, res, next) => {
-    const { pathname, method } = req;
-    if (pathname !== '/login') {
-      next();
-      return;
-    }
-
-    if (method === 'GET') {
-      redirectLoginPage(res);
-      return;
-    }
-
+  return (req, res) => {
     if (req.session) {
-      redirectToGuestBook(res);
+      res.redirect('/guest-book');
       return;
     }
     req.users = users;

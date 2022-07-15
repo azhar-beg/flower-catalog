@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/azhar-beg/flower-catalog#readme",
   "dependencies": {
+    "express": "^4.18.1",
     "handlers": "github:azhar-beg/handlers",
     "http-server": "github:azhar-beg/serverm"
   },

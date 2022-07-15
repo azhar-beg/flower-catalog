@@ -48,7 +48,7 @@ const postComment = xhr => {
 
 const addComments = (event) => {
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', '/add-comment');
+  xhr.open('POST', '/guest-book');
   xhr.onload = () => {
     postComment(xhr)
   };
@@ -56,7 +56,7 @@ const addComments = (event) => {
   const form = document.querySelector('form')
   const formData = new FormData(form);
   form.reset();
-  xhr.send(new URLSearchParams(formData).toString());
+  xhr.send(new URLSearchParams(formData));
 };
 
 const main = () => {
@@ -64,7 +64,7 @@ const main = () => {
   button.addEventListener('click', (event) => {
     addComments(event);
   });
-  setInterval(displayComment, 200);
+  // setInterval(displayComment, 200);
 };
 
 window.onload = main;

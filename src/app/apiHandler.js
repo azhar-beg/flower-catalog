@@ -9,7 +9,7 @@ const serveInstruction = (req, res) => {
   const url = urlInstruction();
   const name = nameKeyInstruction();
   const comment = commentKeyInstruction;
-  res.setHeader('content-type', 'text/html');
+  res.type('html');
   res.end(`${url}<div>${name}\n${comment}</div>`);
 };
 
@@ -30,23 +30,23 @@ const serveApi = (req, res) => {
   }
 };
 
-const serveApiPage = (req, res, next) => {
-  const { pathname, method } = req;
-  if (pathname === '/api-page' && method === 'GET') {
-    serveInstruction(req, res);
-    return;
-  }
+const createApiHandler = guestBook => {
+  return (req, res) => {
+    const { url, method } = req;
+    if (url === '/api-page' && method === 'GET') {
+      serveInstruction(req, res);
+      return;
+    }
 
-  if (pathname === '/api/all' && method === 'GET') {
-    res.end(req.guestBook.getComments());
-    return;
-  }
+    if (url === '/api/all' && method === 'GET') {
+      res.end((guestBook.getComments()));
+      return;
+    }
 
-  if (pathname === '/api' && method === 'GET') {
-    serveApi(req, res);
-    return;
-  }
-  next();
-};
-
-module.exports = { serveApiPage }
+    if (url === '/api' && method === 'GET') {
+      serveApi(req, res);
+      return;
+    }
+  };
+}
+module.exports = { createApiHandler }

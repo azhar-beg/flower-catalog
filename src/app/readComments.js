@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { GuestBook } = require('./guestBook.js');
 
 const readJSON = (file, read) => {

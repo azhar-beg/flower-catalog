@@ -1,23 +1,15 @@
-const { redirectLoginPage } = require('./guestBookHandler');
-
 const createSignupHandler = ({ users }, { userFile }, { persist }) => {
-  return (req, res, next) => {
-    const { pathname, method } = req;
-    if (pathname !== '/signup') {
-      next();
-      return;
-    }
-
-    const { username, password } = req.bodyParams;
+  return (req, res) => {
+    const { username, password } = req.body;
     if (users[username]) {
-      res.statusCode = 409;
+      res.status(409);
       res.end('conflict');
       return;
     }
 
     users[username] = { username, password };
     persist(JSON.stringify(users), userFile);
-    redirectLoginPage(res);
+    res.redirect('/login.html');
     return;
   }
 };

@@ -12,7 +12,7 @@ const login = (xhr, event) => {
   };
   const form = document.querySelector('form')
   const formData = new FormData(form);
-  xhr.send(new URLSearchParams(formData).toString());
+  xhr.send(new URLSearchParams(formData));
 };
 
 const main = () => {
